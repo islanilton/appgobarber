@@ -24,19 +24,22 @@ interface InputRef {
   focus(): void;
 }
 
-const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = ({ name, icon, ...rest }, ref) => {
-
+const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
+  { name, icon, ...rest }, ref,
+) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
 
-  const { registerField, defaultValue = '', fieldName, error } = useField(name);
+  const {
+    registerField, defaultValue = '', fieldName, error,
+  } = useField(name);
   const inputValueRef = useRef<InputValueReference>({ value: defaultValue });
   const inputElementRef = useRef<any>(null);
 
   useImperativeHandle(ref, () => ({
     focus() {
       inputElementRef.current.focus();
-    }
+    },
   }));
 
   useEffect(() => {
@@ -44,7 +47,7 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = ({ name, ico
       name: fieldName,
       ref: inputValueRef.current,
       path: 'value',
-      setValue(ref: any, value){
+      setValue(ref: any, value) {
         inputValueRef.current.value = value;
         inputElementRef.current.setNativeProps({ text: value });
       },
@@ -52,25 +55,26 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = ({ name, ico
         inputValueRef.current.value = '';
         inputElementRef.current.clear();
       },
-    })
+    });
   }, [fieldName, registerField]);
 
   const handleInputFocus = useCallback(() => {
     setIsFocused(true);
-  },[]);
+  }, []);
 
   const handleInputBlur = useCallback(() => {
     setIsFocused(false);
     setIsFilled(!!inputValueRef.current.value);
-  },[]);
+  }, []);
 
   return (
     <Container isFocused={isFocused} isErrored={!!error}>
       {icon && (
-         <Icon
-          name={`${icon}`}
-          size={20}
-          color={isFocused || isFilled ? '#ff9000' : '#666360'} />
+      <Icon
+        name={`${icon}`}
+        size={20}
+        color={isFocused || isFilled ? '#ff9000' : '#666360'}
+      />
       )}
       <TextInput
         ref={inputElementRef}
@@ -86,6 +90,6 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = ({ name, ico
       />
     </Container>
   );
-}
+};
 
 export default forwardRef(Input);

@@ -6,15 +6,16 @@ import {
   Platform,
   View,
   TextInput,
-  Alert
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
-import { FormHandles } from '@unform/core'
+import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
 
 import getValidationErrors from '../../utils/getValidationErrors';
+import api from '../../services/api';
 
 import logoImg from '../../assets/logo.png';
 
@@ -22,10 +23,10 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 
 import {
-    Container,
-    Title,
-    BackToSignIn,
-    BackToSignInText
+  Container,
+  Title,
+  BackToSignIn,
+  BackToSignInText,
 } from './styles';
 
 interface SignupFormData {
@@ -53,13 +54,12 @@ const Signup: React.FC = () => {
         });
 
         await schema.validate(data, { abortEarly: false });
-        // await api.post('/users', data);
-        // history.push('/');
-        // addToast({
-        //   type: 'success',
-        //   title: 'Cadastro realizado!',
-        //   description: 'Você já pode fazer o seu logon no GoBarber.',
-        // });
+        await api.post('/users', data);
+        navigation.goBack();
+        Alert.alert(
+          'Cadastro realizado!',
+          'Você já pode fazer o seu logon no GoBarber.',
+        );
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErrors(error);
@@ -69,23 +69,23 @@ const Signup: React.FC = () => {
 
         Alert.alert(
           'Erro no cadastro',
-          'Erro ao realizar cadastro, tente novamente.'
+          'Erro ao realizar cadastro, tente novamente.',
         );
       }
     },
-    [],
+    [navigation],
   );
 
   return (
     <>
       <KeyboardAvoidingView
-        style={{flex: 1}}
-        behavior={Platform.OS === 'ios' ? 'padding': undefined}
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         enabled
       >
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{flex: 1}}
+          contentContainerStyle={{ flex: 1 }}
         >
           <Container>
             <Image source={logoImg} />
@@ -128,7 +128,8 @@ const Signup: React.FC = () => {
 
             <Button onPress={() => {
               formRef.current?.submitForm();
-            }}>
+            }}
+            >
               Entrar
             </Button>
 

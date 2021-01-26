@@ -5,9 +5,9 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
-  View ,
+  View,
   TextInput,
-  Alert
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
@@ -20,14 +20,15 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 
 import getValidationErrors from '../../utils/getValidationErrors';
+import { useAuth } from '../../hooks/auth';
 
 import {
-    Container,
-    Title,
-    ForgotPassword,
-    ForgotPasswordText,
-    CreateAccountButton,
-    CreateAccountButtonText
+  Container,
+  Title,
+  ForgotPassword,
+  ForgotPasswordText,
+  CreateAccountButton,
+  CreateAccountButtonText,
 } from './styles';
 
 interface SignInFormData {
@@ -39,6 +40,8 @@ const Signin: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
+
+  const { signIn } = useAuth();
 
   const handleSignIn = useCallback(
     async (data: SignInFormData) => {
@@ -52,10 +55,10 @@ const Signin: React.FC = () => {
         });
 
         await schema.validate(data, { abortEarly: false });
-        // await signIn({
-        //   email: data.email,
-        //   password: data.password,
-        // });
+        await signIn({
+          email: data.email,
+          password: data.password,
+        });
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErrors(error);
@@ -65,29 +68,23 @@ const Signin: React.FC = () => {
 
         Alert.alert(
           'Erro na autenticação',
-          'Erro ao realizar login, cheque as credenciais'
+          'Erro ao realizar login, cheque as credenciais',
         );
-
-        // addToast({
-        //   type: 'error',
-        //   title: 'Erro na autenticação',
-        //   description: 'Erro ao realizar login, cheque as credenciais',
-        // });
       }
     },
-    [],
+    [signIn],
   );
 
   return (
     <>
       <KeyboardAvoidingView
-        style={{flex: 1}}
-        behavior={Platform.OS === 'ios' ? 'padding': undefined}
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         enabled
       >
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{flex: 1}}
+          contentContainerStyle={{ flex: 1 }}
         >
           <Container>
             <Image source={logoImg} />
@@ -117,7 +114,8 @@ const Signin: React.FC = () => {
             </Form>
             <Button onPress={() => {
               formRef.current?.submitForm();
-            }}>
+            }}
+            >
               Entrar
             </Button>
             <ForgotPassword onPress={() => {}}>
